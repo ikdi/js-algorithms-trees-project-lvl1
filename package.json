@@ -1,0 +1,37 @@
+{
+  "name": "@hexlet/code",
+  "version": "1.0.0",
+  "description": "Learning project router",
+  "main": "src/index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=14"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {}
+  },
+  "scripts": {
+    "test": "npx jest --bail"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ikdi/js-algorithms-trees-project-lvl1.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ikdi/js-algorithms-trees-project-lvl1/issues"
+  },
+  "homepage": "https://github.com/ikdi/js-algorithms-trees-project-lvl1#readme",
+  "devDependencies": {
+    "@jest/globals": "^27.4.4",
+    "eslint": "^8.5.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jest": "^25.3.0",
+    "jest": "^27.4.5",
+    "jest-cli": "^27.4.5",
+    "simple-git-hooks": "^2.7.0"
+  }
+}
