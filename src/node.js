@@ -31,10 +31,8 @@ export default class Node {
 
   find(segments, method) {
     if (segments.length === 0) {
-      if (!hasProperty(this.handlers, method)) return null;
-      return {
-        path: [], params: {}, handler: this.handlers[method], method,
-      };
+      const handler = this.handlers[method];
+      return handler ? { path: [], params: {}, handler } : null;
     }
 
     const [segment, ...rest] = segments;
@@ -42,8 +40,9 @@ export default class Node {
     if (this.children.has(segment)) {
       const childNode = this.children.get(segment);
       const childData = childNode.find(rest, method);
-      if (childData === null) return null;
-      return { ...childData, path: [segment, ...childData.path] };
+      return childData
+        ? { ...childData, path: [segment, ...childData.path] }
+        : null;
     }
 
     // eslint-disable-next-line no-restricted-syntax

@@ -31,6 +31,6 @@ export default class RoutesTrie {
       throw new Error(`${path} not found!`);
     }
 
-    return { ...result, path: result.path.join('/') };
+    return { ...result, path: result.path.join('/'), method };
   }
 }
