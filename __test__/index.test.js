@@ -39,14 +39,6 @@ beforeAll(() => {
   router = makeRouter(routes);
 });
 
-test('simple route search', () => {
-  const request = { path: '/courses' };
-  const result = router.serve(request);
-
-  expect(result.handler()).toEqual('courses!');
-  expect(result.method).toEqual('GET');
-});
-
 test('simple route search with default GET method', () => {
   const requestWithoutMethod = { path: '/courses' };
   const resultWithoutMethod = router.serve(requestWithoutMethod);
@@ -83,13 +75,20 @@ test('dynamic route search get', () => {
 });
 
 test('dynamic route search post', () => {
-  const request = { path: '/courses/js/exercises/100', method: 'POST' };
+  const request = { path: '/courses/js/exercises/200', method: 'POST' };
   const result = router.serve(request);
 
   expect(result.handler()).toEqual('post exercise!');
-  expect(result.params).toEqual({ course_id: 'js', id: '100' });
+  expect(result.params).toEqual({ course_id: 'js', id: '200' });
   expect(result.path).toEqual('/courses/:course_id/exercises/:id');
   expect(result.method).toEqual('POST');
+});
+test('simple route search', () => {
+  const request = { path: '/courses' };
+  const result = router.serve(request);
+
+  expect(result.handler()).toEqual('courses!');
+  expect(result.method).toEqual('GET');
 });
 
 test('throw an error when path does not exist', () => {

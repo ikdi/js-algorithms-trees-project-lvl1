@@ -9,8 +9,6 @@ export default (routes) => {
     trie.addRoute(path, { handler, method });
   });
 
-  // console.log(inspect(trie, { colors: true, depth: 20 }));
-
   return {
     serve({ path, method = DEFAULT_METHOD }) {
       return trie.find(path, method);

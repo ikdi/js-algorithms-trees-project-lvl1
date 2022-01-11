@@ -31,11 +31,10 @@ export default class Node {
 
   find(segments, method) {
     if (segments.length === 0) {
-      return hasProperty(this.handlers, method)
-        ? {
-          path: [], params: {}, handler: this.handlers[method], method,
-        }
-        : null;
+      if (!hasProperty(this.handlers, method)) return null;
+      return {
+        path: [], params: {}, handler: this.handlers[method], method,
+      };
     }
 
     const [segment, ...rest] = segments;
@@ -43,26 +42,19 @@ export default class Node {
     if (this.children.has(segment)) {
       const childNode = this.children.get(segment);
       const childData = childNode.find(rest, method);
-      return childData === null
-        ? null
-        : {
-          path: [segment, ...childData.path],
-          params: { ...childData.params },
-          handler: childData.handler,
-          method: childData.method,
-        };
+      if (childData === null) return null;
+      return { ...childData, path: [segment, ...childData.path] };
     }
 
     // eslint-disable-next-line no-restricted-syntax
-    for (const [dynamicSegment, childNode] of this.dynamicChildren.entries()) {
+    for (const [dynSegment, childNode] of this.dynamicChildren.entries()) {
       const childData = childNode.find(rest, method);
       if (childData !== null) {
-        const dynamicSegmentName = dynamicSegment.slice(1);
+        const name = dynSegment.slice(1);
         return {
-          path: [dynamicSegment, ...childData.path],
-          params: { [dynamicSegmentName]: segment, ...childData.params },
-          handler: childData.handler,
-          method: childData.method,
+          ...childData,
+          path: [dynSegment, ...childData.path],
+          params: { [name]: segment, ...childData.params },
         };
       }
     }
