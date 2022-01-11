@@ -3,22 +3,32 @@ import makeRouter from '../src/index.js';
 
 const routes = [
   {
+    method: 'GET',
     path: '/courses',
     handler: () => 'courses!',
   },
   {
+    method: 'GET',
     path: '/courses/:id',
     handler: (id) => `course: ${id}`,
   },
   {
+    method: 'GET',
     path: '/courses/:course_id/exercises/:id',
-    handler: () => 'exercise!',
+    handler: () => 'get exercise!',
   },
   {
+    method: 'POST',
+    path: '/courses/:course_id/exercises/:id',
+    handler: () => 'post exercise!',
+  },
+  {
+    method: 'GET',
     path: '/lessons/:id/',
     handler: () => 'lessons!',
   },
   {
+    method: 'GET',
     path: '/',
     handler: () => 'root!',
   },
@@ -30,37 +40,66 @@ beforeAll(() => {
 });
 
 test('simple route search', () => {
-  const path = '/courses';
-  const result = router.serve(path);
+  const request = { path: '/courses' };
+  const result = router.serve(request);
 
   expect(result.handler()).toEqual('courses!');
+  expect(result.method).toEqual('GET');
+});
+
+test('simple route search with default GET method', () => {
+  const requestWithoutMethod = { path: '/courses' };
+  const resultWithoutMethod = router.serve(requestWithoutMethod);
+
+  const requestWithMethod = { path: '/courses', method: 'GET' };
+  const resultWithMethod = router.serve(requestWithMethod);
+
+  expect(resultWithoutMethod).toEqual(resultWithMethod);
 });
 
 test('route search with trailing slash', () => {
-  const path = '/courses/';
-  const result = router.serve(path);
+  const request = { path: '/courses/' };
+  const result = router.serve(request);
 
   expect(result.handler()).toEqual('courses!');
 });
 
 test('root route search', () => {
-  const path = '/';
-  const result = router.serve(path);
+  const request = { path: '/' };
+  const result = router.serve(request);
 
   expect(result.handler()).toEqual('root!');
+  expect(result.method).toEqual('GET');
 });
 
-test('dynamic route search', () => {
-  const path = '/courses/js/exercises/100';
-  const result = router.serve(path);
+test('dynamic route search get', () => {
+  const request = { path: '/courses/js/exercises/100', method: 'GET' };
+  const result = router.serve(request);
 
-  expect(result.handler()).toEqual('exercise!');
+  expect(result.handler()).toEqual('get exercise!');
   expect(result.params).toEqual({ course_id: 'js', id: '100' });
   expect(result.path).toEqual('/courses/:course_id/exercises/:id');
+  expect(result.method).toEqual('GET');
 });
 
-test('throw an error when route has not found', () => {
-  const path = '/no_such_way';
+test('dynamic route search post', () => {
+  const request = { path: '/courses/js/exercises/100', method: 'POST' };
+  const result = router.serve(request);
 
-  expect(() => { router.serve(path); }).toThrow();
+  expect(result.handler()).toEqual('post exercise!');
+  expect(result.params).toEqual({ course_id: 'js', id: '100' });
+  expect(result.path).toEqual('/courses/:course_id/exercises/:id');
+  expect(result.method).toEqual('POST');
+});
+
+test('throw an error when path does not exist', () => {
+  const request = { path: '/no_such_way' };
+
+  expect(() => { router.serve(request); }).toThrow();
+});
+
+test('throw an error when path exists but founded method does not', () => {
+  const request = { path: '/courses/js/exercises/100', method: 'DELETE' };
+
+  expect(() => { router.serve(request); }).toThrow();
 });

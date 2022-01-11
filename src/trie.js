@@ -10,27 +10,27 @@ export default class RoutesTrie {
     this.root = new Node('*');
   }
 
-  addRoute(path, handler) {
+  addRoute(path, options) {
     const normalizedPath = RoutesTrie.normalizePath(path);
     const segments = normalizedPath.split('/');
     const segmentsLastIndex = segments.length - 1;
 
     segments.reduce((currentNode, segment, i) => {
-      const currentHandler = segmentsLastIndex === i ? handler : null;
-      return currentNode.addChild(segment, currentHandler);
+      const terminalOptions = segmentsLastIndex === i ? options : null;
+      return currentNode.addChild(segment, terminalOptions);
     }, this.root);
   }
 
-  find(path) {
+  find(path, method) {
     const normalizedPath = RoutesTrie.normalizePath(path);
     const segments = normalizedPath.split('/');
 
-    const result = this.root.find(segments);
+    const result = this.root.find(segments, method);
 
     if (!result) {
       throw new Error(`${path} not found!`);
     }
 
-    return { path: result.path.join('/'), handler: result.handler, params: { ...result.params } };
+    return { ...result, path: result.path.join('/') };
   }
 }
