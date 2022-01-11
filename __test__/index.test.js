@@ -14,6 +14,14 @@ const routes = [
     path: '/courses/:course_id/exercises/:id',
     handler: () => 'exercise!',
   },
+  {
+    path: '/lessons/:id/',
+    handler: () => 'lessons!',
+  },
+  {
+    path: '/',
+    handler: () => 'root!',
+  },
 ];
 let router = null;
 
@@ -26,6 +34,20 @@ test('simple route search', () => {
   const result = router.serve(path);
 
   expect(result.handler()).toEqual('courses!');
+});
+
+test('route search with trailing slash', () => {
+  const path = '/courses/';
+  const result = router.serve(path);
+
+  expect(result.handler()).toEqual('courses!');
+});
+
+test('root route search', () => {
+  const path = '/';
+  const result = router.serve(path);
+
+  expect(result.handler()).toEqual('root!');
 });
 
 test('dynamic route search', () => {
