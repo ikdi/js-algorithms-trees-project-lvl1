@@ -3,22 +3,40 @@ const hasProperty = (obj, property) => Object.prototype.hasOwnProperty.call(obj,
 export default class Node {
   static DYNAMIC_SIGN = ':';
 
-  constructor(name, options = null) {
+  constructor(name, constraint = null, options = null) {
+    Node.checkConstraintType(constraint);
+
     this.name = name;
+    this.constraint = constraint;
     this.handlers = options ? { [options.method]: options.handler } : {};
     this.children = new Map();
     this.dynamicChildren = new Map();
   }
 
-  addChild(segment, options) {
-    const children = segment.startsWith(Node.DYNAMIC_SIGN) ? this.dynamicChildren : this.children;
-    if (!children.has(segment)) {
-      const node = new Node(segment, options);
-      children.set(segment, node);
+  static checkConstraintType(constraint) {
+    if (constraint === null) return true;
+    if (constraint instanceof RegExp) return true;
+    if (typeof constraint === 'function') return true;
+
+    throw new Error('Unknown constraint type');
+  }
+
+  isValidName(name) {
+    if (!this.constraint) return true;
+    if (this.constraint instanceof RegExp) return this.constraint.test(name);
+    if (typeof this.constraint === 'function') return this.constraint(name);
+    return false;
+  }
+
+  addChild(name, constraint, options) {
+    const children = name.startsWith(Node.DYNAMIC_SIGN) ? this.dynamicChildren : this.children;
+    if (!children.has(name)) {
+      const node = new Node(name, constraint, options);
+      children.set(name, node);
       return node;
     }
 
-    const node = children.get(segment);
+    const node = children.get(name);
     node.setOptions(options);
     return node;
   }
@@ -44,14 +62,16 @@ export default class Node {
     const [segment, ...rest] = segments;
     // eslint-disable-next-line no-restricted-syntax
     for (const [dynSegment, child] of this.dynamicChildren.entries()) {
-      const data = child.find(rest, method);
-      if (data !== null) {
-        const name = dynSegment.slice(1);
-        return {
-          ...data,
-          path: [dynSegment, ...data.path],
-          params: { [name]: segment, ...data.params },
-        };
+      if (child.isValidName(segment)) {
+        const data = child.find(rest, method);
+        if (data !== null) {
+          const name = dynSegment.slice(1);
+          return {
+            ...data,
+            path: [dynSegment, ...data.path],
+            params: { [name]: segment, ...data.params },
+          };
+        }
       }
     }
 

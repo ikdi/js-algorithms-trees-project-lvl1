@@ -15,6 +15,7 @@ const routes = [
   {
     method: 'GET',
     path: '/courses/:course_id/exercises/:id',
+    constraints: { id: /\d+/, course_id: (courseId) => courseId.startsWith('js') },
     handler: () => 'get exercise!',
   },
   {
@@ -82,6 +83,12 @@ test('throw an error when path does not exist', () => {
 
 test('throw an error when path exists but founded method does not', () => {
   const request = { path: '/courses/js/exercises/100', method: 'DELETE' };
+
+  expect(() => { router.serve(request); }).toThrow();
+});
+
+test('throw an error when path violates constraints', () => {
+  const request = { path: '/courses/noop/exercises/noop' };
 
   expect(() => { router.serve(request); }).toThrow();
 });
