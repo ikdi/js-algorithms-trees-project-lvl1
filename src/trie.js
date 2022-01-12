@@ -37,7 +37,7 @@ export default class RoutesTrie {
 
   find(path, method) {
     const errMessage = /no such path/i;
-    if (!path.startsWith('/')) throw new Error(errMessage);
+    if (!path.includes('/')) throw new Error(errMessage);
     const normalizedPath = RoutesTrie.normalizePath(path);
     const segments = normalizedPath.split('/');
 
