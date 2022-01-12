@@ -42,7 +42,7 @@ export default class RoutesTrie {
     const result = this.root.find(segments, method);
 
     if (!result) {
-      throw new Error(`${path} not found!`);
+      throw new Error(/no such path/i);
     }
 
     return { ...result, path: result.path.join('/'), method };
