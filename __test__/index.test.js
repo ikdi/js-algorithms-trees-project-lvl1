@@ -75,20 +75,14 @@ test('dynamic route search post', () => {
   expect(result.method).toEqual('POST');
 });
 
-test('throw an error when path does not exist', () => {
-  const request = { path: '/no_such_way' };
+const throwCases = [
+  ['path does not exist', '/no_such_way', null],
+  ['path exists but specified method does not', '/courses/js/exercises/100', 'DELETE'],
+  ['path violates constraints', '/courses/noop/exercises/noop', null],
+];
 
-  expect(() => { router.serve(request); }).toThrow();
-});
-
-test('throw an error when path exists but founded method does not', () => {
-  const request = { path: '/courses/js/exercises/100', method: 'DELETE' };
-
-  expect(() => { router.serve(request); }).toThrow();
-});
-
-test('throw an error when path violates constraints', () => {
-  const request = { path: '/courses/noop/exercises/noop' };
-
+test.each(throwCases)('throw an error when %s', (_, path, method) => {
+  const methods = method ? { method } : {};
+  const request = { path, ...methods };
   expect(() => { router.serve(request); }).toThrow();
 });

@@ -3,7 +3,7 @@ const hasProperty = (obj, property) => Object.prototype.hasOwnProperty.call(obj,
 const DYNAMIC_SIGN = ':';
 export default class Node {
   constructor(name, constraint = null, options = null) {
-    Node.checkConstraintType(constraint);
+    Node.validateConstraint(constraint);
 
     this.name = name;
     this.constraint = constraint;
@@ -12,7 +12,7 @@ export default class Node {
     this.dynamicChildren = new Map();
   }
 
-  static checkConstraintType(constraint) {
+  static validateConstraint(constraint) {
     if (constraint === null) return true;
     if (constraint instanceof RegExp) return true;
     if (typeof constraint === 'function') return true;
@@ -61,16 +61,16 @@ export default class Node {
     const [segment, ...rest] = segments;
     // eslint-disable-next-line no-restricted-syntax
     for (const [dynSegment, child] of this.dynamicChildren.entries()) {
-      if (child.isValidName(segment)) {
-        const data = child.find(rest, method);
-        if (data !== null) {
-          const name = dynSegment.slice(1);
-          return {
-            ...data,
-            path: [dynSegment, ...data.path],
-            params: { [name]: segment, ...data.params },
-          };
-        }
+      // eslint-disable-next-line no-continue
+      if (!child.isValidName(segment)) continue;
+      const data = child.find(rest, method);
+      if (data !== null) {
+        const name = dynSegment.slice(1);
+        return {
+          ...data,
+          path: [dynSegment, ...data.path],
+          params: { [name]: segment, ...data.params },
+        };
       }
     }
 

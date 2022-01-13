@@ -1,9 +1,11 @@
 import Node from './node.js';
 
+const SEGMENT_DELIMITER = '/';
+
 export default class RoutesTrie {
   static normalizePath(path) {
     const trimmedPath = path.trim();
-    return trimmedPath.endsWith('/') ? trimmedPath.slice(0, -1) : trimmedPath;
+    return trimmedPath.endsWith(SEGMENT_DELIMITER) ? trimmedPath.slice(0, -1) : trimmedPath;
   }
 
   constructor() {
@@ -23,7 +25,7 @@ export default class RoutesTrie {
 
   addRoute(path, options) {
     const normalizedPath = RoutesTrie.normalizePath(path);
-    const segments = normalizedPath.split('/');
+    const segments = normalizedPath.split(SEGMENT_DELIMITER);
     const segmentsLastIndex = segments.length - 1;
 
     const { constraints, ...terminalOptions } = options;
@@ -38,6 +40,7 @@ export default class RoutesTrie {
   find(path, method) {
     const errMessage = /no such path/i;
     if (!path.includes('/')) throw new Error(errMessage);
+
     const normalizedPath = RoutesTrie.normalizePath(path);
     const segments = normalizedPath.split('/');
 
