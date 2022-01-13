@@ -1,8 +1,7 @@
 const hasProperty = (obj, property) => Object.prototype.hasOwnProperty.call(obj, property);
 
+const DYNAMIC_SIGN = ':';
 export default class Node {
-  static DYNAMIC_SIGN = ':';
-
   constructor(name, constraint = null, options = null) {
     Node.checkConstraintType(constraint);
 
@@ -29,7 +28,7 @@ export default class Node {
   }
 
   addChild(name, constraint, options) {
-    const children = name.startsWith(Node.DYNAMIC_SIGN) ? this.dynamicChildren : this.children;
+    const children = name.startsWith(DYNAMIC_SIGN) ? this.dynamicChildren : this.children;
     if (!children.has(name)) {
       const node = new Node(name, constraint, options);
       children.set(name, node);
